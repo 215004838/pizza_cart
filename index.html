@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfect Pizza</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    /* CSS styles */
+    body {
+      background-image: url("https://img.freepik.com/free-vector/restaurant-mural-wallpaper_23-2148707022.jpg");
+      background-size: fixed;
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      color: green;
+      text-align: center;
+    }
+
+    .order_box {
+      background-color: green;
+      color: black;
+      padding: 20px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+
+    .pizza-list {
+      list-style-type: none;
+      padding: 0;
+      margin-bottom: 10px;
+    }
+
+    .pizza-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .pizza-item button {
+      margin: 0 5px;
+    }
+
+    .payment-modal {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .message {
+      margin-top: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .pizzas {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .pizza {
+      background-color: green;
+      color: #333;
+      padding: 20px;
+      margin: 10px;
+      border-radius: 5px;
+      text-align: center;
+      width: 300px;
+    }
+
+    .pizza h2 {
+      color: #fff;
+      background-color: #333;
+      padding: 10px;
+      margin: 0;
+      border-radius: 5px;
+    }
+
+    .pizza img {
+      width: 400px;
+      height: 400px;
+      object-fit: cover;
+      margin: 10px auto;
+    }
+
+    .pizza h3 {
+      margin: 0;
+    }
+
+    .pizza .ingredients {
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .pizza .special {
+      font-size: 14px;
+      color: #fff;
+    }
+
+    .contact-us {
+      background-color: green;
+      color: whitesmoke;
+      padding: 20px;
+      border-radius: 5px;
+      text-align: center;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .contact-us h2 {
+      margin-top: 0;
+    }
+
+    .text-header {
+      color: #fff;
+    }
+
+    .text-content {
+      color: #fff;
+    }
+    h1 {
+      color: green;
+      text-align: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      margin-right: 10px;
+      width: 500px;
+      height: 250px;
+    }
+
+
+    .header-text {
+      font-size: 0%;
+      font-weight: bold;
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <img src="C:\Users\MANCOBA KHUMALO\projects\pizza_card\305937675_457339646430377_616511094266882575_n.jpg" alt="Logo">
+      <h1 class="header-text">Corn-Joe Pizza</h1>
+    </div>
+  </header>
+
+  <div class="order_box" x-data="cart()">
+    <div>
+      <h2>Shopping cart</h2>
+      <ul class="pizza-list">
+        <template x-for="(pizza, index) in pizzas" :key="index">
+          <li class="pizza-item">
+            <span x-text="pizza.name"></span>
+            <button x-on:click="incrementQuantity(pizza)">+</button>
+            <span x-text="pizza.quantity"></span>
+            <button x-on:click="decrementQuantity(pizza)">-</button>
+            <span x-text="formatPrice(pizza.price)"></span>
+            <button x-on:click="removePizza(pizza)">Remove</button>
+          </li>
+        </template>
+      </ul>
+      <div>Total Cost: <span x-text="formatPrice(totalCost)"></span></div>
+      <button x-on:click="checkout" :disabled="totalPizzas.length === 0 && totalCost === 0">Checkout</button>
+    </div>
+
+    <div>
+      <h2>Select Pizza Size</h2>
+      <template x-for="(pizza, index) in pizzas" :key="index">
+        <button x-on:click="addToCart(pizza)">
+          Add <span x-text="pizza.name"></span> Pizza
+        </button>
+      </template>
+    </div>
+
+    <div class="payment-modal" x-show="showPaymentModal">
+      <h3>Enter Payment Amount</h3>
+      <input type="number" x-model="paymentAmount">
+      <button x-on:click="processPayment">Submit</button>
+    </div>
+
+    <div x-show="showMessage" x-text="paymentSuccessful ? 'Thank you for your payment!' : 'Insufficient funds.'" class="message"></div>
+  </div>
+
+  <div class="pizzas">
+    <div class="pizza">
+      <h2 class="text-header">Deluxe Supreme</h2>
+      <img src="pizza-1-820x450.jpg" alt="Small Pizza">
+      <h3>R149.00</h3>
+      <div class="ingredients text-content">
+        Indulge in the opulence of our Deluxe Supreme pizza. Topped with luxurious ingredients like truffles, lobster, and caviar, this masterpiece offers a harmonious blend of flavors that will satisfy even the most refined palates.
+      </div>
+      <div class="special text-content">
+        It's made with the finest ingredients and carefully crafted to nourish your cravings.
+      </div>
+    </div>
+    <div class="pizza">
+      <h2 class="text-header">Gourmet Truffle</h2>
+      <img src="Most-Expensive-Pizza-5.jpg" alt="Medium Pizza">
+      <h3>R289.00</h3>
+      <div class="ingredients text-content">
+        Elevate your taste buds with our Gourmet Truffle pizza. Featuring a symphony of truffle-infused ingredients, including black truffles, truffle cheese, and truffle oil, this pizza delivers a rich and earthy flavor profile that is truly gourmet.
+      </div>
+      <div class="special text-content">
+      It features a delicious combination of flavors with the perfect balance of toppings and sauces.
+      </div>
+    </div>
+    <div class="pizza">
+      <h2 class="text-header">Extravagant Seafood</h2>
+      <img src="Most-Expensive-Pizza-8.jpg" alt="Large Pizza">
+      <h3>R429.00</h3>
+      <div class="ingredients text-content">
+        Description: Dive into the ocean of flavors with our Extravagant Seafood pizza. Loaded with an assortment of premium seafood including succulent lobster, plump shrimp, tender scallops, and delicate crab meat, this pizza is a seafood lover's paradise. Enhanced with a zesty tomato sauce, garlic, herbs, and a hint of fresh lemon zest, it's a luxurious treat.
+      </div>
+      <div class="special text-content">
+      It's loaded with premium toppings and baked to perfection for a truly satisfying experience.
+      </div>
+    </div>
+  </div>
+
+  <div class="contact-us">
+    <h2>Contact Us</h2>
+    <p>If you have any questions, please contact us at:</p>
+    <p>Phone: 072 509 7664</p>
+    <p>Email: info@cornjoe.com</p>
+  </div>
+
+  <script>
+    function cart() {
+      return {
+        pizzas: [
+          { name: 'Small', quantity: 0, price: 459.00 },
+          { name: 'Medium', quantity: 0, price: 625.00 },
+          { name: 'Large', quantity: 0, price: 855.00 },
+        ],
+        totalPizzas: [],
+        totalCost: 0,
+        showPaymentModal: false,
+        paymentAmount: 0,
+        showMessage: false,
+        paymentSuccessful: false,
+
+        formatPrice(price) {
+          return `R${price.toFixed(2)}`;
+        },
+
+        addToCart(pizza) {
+          const existingPizza = this.totalPizzas.find(item => item.name === pizza.name);
+          if (existingPizza) {
+            existingPizza.quantity++;
+          } else {
+            this.totalPizzas.push({ ...pizza, quantity: 1 });
+          }
+          this.totalCost += pizza.price;
+        },
+
+        incrementQuantity(pizza) {
+          pizza.quantity++;
+          this.totalCost += pizza.price;
+        },
+
+        decrementQuantity(pizza) {
+          if (pizza.quantity > 0) {
+            pizza.quantity--;
+            this.totalCost -= pizza.price;
+          }
+          if (pizza.quantity === 0) {
+            const index = this.totalPizzas.findIndex(item => item.name === pizza.name);
+            this.totalPizzas.splice(index, 1);
+          }
+        },
+
+        removePizza(pizza) {
+          const index = this.totalPizzas.findIndex(item => item.name === pizza.name);
+          if (index > -1) {
+            this.totalCost -= pizza.price * pizza.quantity;
+            this.totalPizzas.splice(index, 1);
+          }
+        },
+
+        checkout() {
+          if (this.totalCost > 0) {
+            this.showPaymentModal = true;
+          } else {
+            this.showMessage = true;
+            this.message = "Please add pizzas to the cart.";
+            setTimeout(() => {
+              this.showMessage = false;
+              this.message = "";
+            }, 2000);
+          }
+        },
+
+        processPayment() {
+          if (this.paymentAmount >= this.totalCost) {
+            this.showMessage = true;
+            this.paymentSuccessful = true;
+            setTimeout(() => {
+              this.showMessage = false;
+              this.paymentSuccessful = false;
+              this.totalPizzas = [];
+              this.totalCost = 0;
+              this.showPaymentModal = false;
+            }, 2000);
+          } else {
+            this.showMessage = true;
+            this.paymentSuccessful = false;
+            setTimeout(() => {
+              this.showMessage = false;
+              this.paymentSuccessful = false;
+            }, 2000);
+          }
+        }
+      };
+    }
+  </script>
+</body>
+
+</html>
